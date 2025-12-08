@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amandla - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Amandla</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="teams.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    My Teams
+                </a>
+                <a href="my-tasks.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    My Tasks
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-ghost btn-block" id="logoutBtn">
+                    <span class="nav-icon">↪</span>
+                    Logout
+                </button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>Welcome to Your Workspace</h1>
+                    <p class="page-subtitle">Choose an action to get started</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card" id="createTeamCard">
+                    <div class="dashboard-card-icon">🚀</div>
+                    <h3>Create a Team</h3>
+                    <p>Start a new workspace and invite team members to collaborate</p>
+                    <button class="btn btn-primary">Get Started</button>
+                </div>
+                
+                <div class="dashboard-card" id="joinTeamCard">
+                    <div class="dashboard-card-icon">👋</div>
+                    <h3>Join a Team</h3>
+                    <p>Browse available teams and join existing workspaces</p>
+                    <button class="btn btn-secondary">Browse Teams</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="modal-container"></div>
+    <div id="toast-container"></div>
+    
+    <script type="module">
+        import { logout, checkAuth } from './js/auth.js';
+        import { showModal, hideModal, showToast } from './js/ui.js';
+        import { getPublicTeams, joinTeam } from './js/api.js';
+        
+        if (!checkAuth()) {
+            window.location.href = 'index.html';
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            logout();
+            window.location.href = 'index.html';
+        });
+        
+        document.getElementById('createTeamCard').querySelector('.btn').addEventListener('click', () => {
+            window.location.href = 'create-team.html';
+        });
+        
+       document.getElementById('joinTeamCard').querySelector('.btn').addEventListener('click', async () => {
+            try {
+                const teams = await getPublicTeams();
+                
+                let teamsHTML = teams.length > 0 
+                    ? teams.map(team => `
+                        <div class="team-list-item">
+                            <div class="team-list-info">
+                                <h4>${team.name || team.teamname}</h4>
+                                <p>Team ID: ${team.id}</p>
+                            </div>
+                            <button class="btn btn-sm btn-primary join-team-btn" data-team-id="${team.id}">Join</button>
+                        </div>
+                    `).join('')
+                    : '<p class="empty-state">No public teams available</p>';
+                
+                const modalContent = `
+                    <h2>Join a Team</h2>
+                    <div class="modal-section">
+                        <label for="teamId">Enter Team ID</label>
+                        <input type="text" id="teamId" placeholder="Enter team ID to join" class="input">
+                        <button class="btn btn-primary" id="joinByIdBtn" style="margin-top: 12px;">Join by ID</button>
+                    </div>
+                    <div class="modal-divider">OR</div>
+                    <div class="modal-section">
+                        <h3>Available Teams</h3>
+                        <div class="team-list">${teamsHTML}</div>
+                    </div>
+                `;
+                
+                showModal(modalContent);
+                
+                document.getElementById('joinByIdBtn').addEventListener('click', async () => {
+                    const teamId = document.getElementById('teamId').value.trim();
+                    if (!teamId) {
+                        showToast('Please enter a team ID', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        await joinTeam(teamId);
+                        showToast('Successfully joined team!', 'success');
+                        hideModal();
+                        setTimeout(() => window.location.href = `team-detail.html?id=${teamId}`, 1000);
+                    } catch (error) {
+                        showToast(error.message || 'Failed to join team', 'error');
+                    }
+                });
+                
+                document.querySelectorAll('.join-team-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const teamId = e.target.dataset.teamId;
+                        try {
+                            await joinTeam(teamId);
+                            showToast('Successfully joined team!', 'success');
+                            hideModal();
+                            setTimeout(() => window.location.href = `team-detail.html?id=${teamId}`, 1000);
+                        } catch (error) {
+                            showToast(error.message || 'Failed to join team', 'error');
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                showToast('Failed to load teams', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

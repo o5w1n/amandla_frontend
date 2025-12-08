@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amandla - Team Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Amandla</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="teams.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    My Teams
+                </a>
+                <a href="my-tasks.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    My Tasks
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-ghost btn-block" id="logoutBtn">
+                    <span class="nav-icon">↪</span>
+                    Logout
+                </button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 id="teamName">Loading...</h1>
+                    <p class="page-subtitle" style="margin-top: 4px;">Team ID: <span id="teamId"></span></p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="createTaskBtn">+ Create Task</button>
+                </div>
+            </div>
+            
+            <div class="team-info-cards">
+                <div class="info-card">
+                    <div class="info-card-label">Members</div>
+                    <div class="info-card-value" id="memberCount">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">Total Tasks</div>
+                    <div class="info-card-value" id="taskCount">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">Completed</div>
+                    <div class="info-card-value" id="completedCount">-</div>
+                </div>
+            </div>
+            
+            <div class="section-header">
+                <h2>Tasks</h2>
+            </div>
+            
+            <div id="tasksContainer"></div>
+        </main>
+    </div>
+    
+    <div id="modal-container"></div>
+    <div id="toast-container"></div>
+    
+    <script type="module" src="./js/team-detail.js"></script>
+</body>
+</html>

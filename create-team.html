@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amandla - Create Team</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Amandla</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="teams.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    My Teams
+                </a>
+                <a href="my-tasks.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    My Tasks
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-ghost btn-block" id="logoutBtn">
+                    <span class="nav-icon">↪</span>
+                    Logout
+                </button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Create a New Team</h1>
+                <p class="page-subtitle">Set up your workspace and invite team members</p>
+            </div>
+            
+            <div class="form-container">
+                <form id="createTeamForm" class="standard-form">
+                    <div class="form-group">
+                        <label for="teamname">Team Name</label>
+                        <input type="text" id="teamname" name="teamname" placeholder="Enter team name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="memberEmails">Invite Members (Optional)</label>
+                        <div id="emailInputs">
+                            <input type="email" class="email-input" placeholder="member@example.com">
+                        </div>
+                        <button type="button" class="btn btn-ghost btn-sm" id="addEmailBtn" style="margin-top: 8px;">
+                            + Add Another Email
+                        </button>
+                    </div>
+                    
+                    <div class="form-error" id="createTeamError"></div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-ghost" onclick="window.location.href='dashboard.html'">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">Create Team</span>
+                            <span class="btn-loader" style="display: none;">●●●</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <div id="toast-container"></div>
+    
+    <script type="module">
+        import { logout, checkAuth } from './js/auth.js';
+        import { createTeam } from './js/api.js';
+        import { showToast } from './js/ui.js';
+        
+        if (!checkAuth()) {
+            window.location.href = 'index.html';
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            logout();
+            window.location.href = 'index.html';
+        });
+        
+        document.getElementById('addEmailBtn').addEventListener('click', () => {
+            const emailInputs = document.getElementById('emailInputs');
+            const newInput = document.createElement('input');
+            newInput.type = 'email';
+            newInput.className = 'email-input';
+            newInput.placeholder = 'member@example.com';
+            newInput.style.marginTop = '8px';
+            emailInputs.appendChild(newInput);
+        });
+        
+        document.getElementById('createTeamForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+            const errorDiv = document.getElementById('createTeamError');
+            
+            errorDiv.textContent = '';
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
+            
+            const teamname = document.getElementById('teamname').value.trim();
+            const emailInputs = document.querySelectorAll('.email-input');
+            const memberEmails = Array.from(emailInputs)
+                .map(input => input.value.trim())
+                .filter(email => email !== '');
+            
+            try {
+                const result = await createTeam(teamname, memberEmails);
+                showToast('Team created successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = `team-detail.html?id=${result.team.id}`;
+                }, 1000);
+            } catch (error) {
+                errorDiv.textContent = error.message || 'Failed to create team. Please try again.';
+                showToast(error.message || 'Failed to create team', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

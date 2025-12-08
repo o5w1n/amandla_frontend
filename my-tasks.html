@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amandla - My Tasks</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Amandla</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="teams.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    My Teams
+                </a>
+                <a href="my-tasks.html" class="nav-item active">
+                    <span class="nav-icon">✓</span>
+                    My Tasks
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-ghost btn-block" id="logoutBtn">
+                    <span class="nav-icon">↪</span>
+                    Logout
+                </button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h1>My Tasks</h1>
+                <p class="page-subtitle">All tasks assigned to you across teams</p>
+            </div>
+            
+            <div class="tasks-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTasksCount">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingTasksCount">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="inProgressTasksCount">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedTasksCount">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+            
+            <div id="myTasksContainer"></div>
+        </main>
+    </div>
+    
+    <div id="modal-container"></div>
+    <div id="toast-container"></div>
+    
+    <script type="module" src="./js/my-tasks.js"></script>
+</body>
+</html>
