@@ -1,4 +1,4 @@
-const api_url = 'http://localhost:3004';
+const api_url = 'https://amandla-backend.onrender.com';
 
 let authToken = null;
 
