@@ -2,6 +2,18 @@ const api_url = 'https://amandla-backend.onrender.com';
 
 let authToken = null;
 
+export async function checkBackendHealth() {
+    try {
+        const response = await fetch(`${api_url}/health`);
+        const data = await response.json();
+        console.log('Backend health check:', data);
+        return data;
+    } catch (error) {
+        console.error('Backend health check failed:', error);
+        throw error;
+    }
+}
+
 export function setToken(token) {
     authToken = token;
     if (token) {
