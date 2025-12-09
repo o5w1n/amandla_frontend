@@ -90,7 +90,8 @@
         
        document.getElementById('joinTeamCard').querySelector('.btn').addEventListener('click', async () => {
             try {
-                const teams = await getPublicTeams();
+                const data = await getPublicTeams();
+                const teams = data.teams || [];
                 
                 let teamsHTML = teams.length > 0 
                     ? teams.map(team => `

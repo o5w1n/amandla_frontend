@@ -23,7 +23,8 @@ async function loadTeams() {
     const container = document.getElementById('teamsContainer');
 
     try {
-        const teams = await getMyTeams();
+        const data = await getMyTeams();
+        const teams = data.teams || [];
 
         if (teams.length === 0) {
             container.innerHTML = '<div class="empty-state">You haven\'t joined any teams yet. Create or join a team to get started!</div>';

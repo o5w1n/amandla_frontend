@@ -25,7 +25,8 @@ async function loadMyTasks() {
     container.innerHTML = '<div class="skeleton-card"></div>';
 
     try {
-        const tasks = await getMyTasks();
+        const data = await getMyTasks();
+        const tasks = data.tasks || [];
         currentTasks = tasks;
 
 

@@ -25,12 +25,14 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 async function loadTeamDetails() {
     try {
-        const team = await getTeam(teamId);
+        const data = await getTeam(teamId);
+        const team = data.team || {};
+        const members = data.members || [];
 
         document.getElementById('teamName').textContent = team.name || team.teamname || 'Team';
         document.getElementById('teamId').textContent = team.id;
 
-        const memberCount = team.members?.length || 0;
+        const memberCount = members.length || 0;
         document.getElementById('memberCount').textContent = memberCount;
 
         await loadTasks();
@@ -48,7 +50,8 @@ async function loadTasks() {
     container.innerHTML = '<div class="skeleton-card"></div>';
 
     try {
-        const tasks = await getTasks(teamId);
+        const data = await getTasks(teamId);
+        const tasks = data.task || [];
         currentTasks = tasks;
 
         const totalTasks = tasks.length;
