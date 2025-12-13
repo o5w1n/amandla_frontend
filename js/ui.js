@@ -1,201 +1,231 @@
-export function showModal(content) {
-    const modalContainer = document.getElementById('modal-container');
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = content;
+export function showmodel(content) {
+    var containerm = document.getElementById('model-container');
+    var model = document.createElement('div');
+    model.className = 'model';
+    model.innerHTML = content;
 
-    modalContainer.innerHTML = '';
-    modalContainer.appendChild(modal);
-    modalContainer.classList.add('active');
+    containerm.innerHTML = '';
+    containerm.appendChild(model);
+    containerm.classList.add('active');
 
-    modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-            hideModal();
+    containerm.addEventListener('click', function (e) {
+        if (e.target === containerm) {
+            hidemodel();
         }
     });
 }
 
-export function hideModal() {
-    const modalContainer = document.getElementById('modal-container');
-    modalContainer.classList.remove('active');
-    modalContainer.innerHTML = '';
+export function hidemodel() {
+    var containerm = document.getElementById('model-container');
+    containerm.classList.remove('active');
+    containerm.innerHTML = '';
 }
 
-export function showToast(message, type = 'info') {
-    const toastContainer = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+export function showToast(message, type) {
+    if (!type) type = 'info';
+    var toastcontainer = document.getElementById('toast-container');
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
     toast.textContent = message;
 
-    toastContainer.appendChild(toast);
+    toastcontainer.appendChild(toast);
 
-    setTimeout(() => {
+    setTimeout(function () {
         toast.style.animation = 'toastSlideIn 0.3s ease-out reverse';
-        setTimeout(() => {
+        setTimeout(function () {
             toast.remove();
         }, 300);
     }, 3000);
 }
 
 export function showConfirm(message, onConfirm) {
-    const content = `
-        <h2>Confirm Action</h2>
-        <p style="margin: 24px 0; color: var(--color-text-secondary);">${message}</p>
-        <div class="form-actions">
-            <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
-            <button class="btn btn-danger" id="confirmOk">Confirm</button>
-        </div>
-    `;
+    var content =
+        '<h2>Confirm Action</h2>' +
+        '<p style="margin: 24px 0; color: var(--color-text-secondary);">' + message + '</p>' +
+        '<div class="form-actions">' +
+        '<button class="btn btn-ghost" id="confirmCancel">Cancel</button>' +
+        '<button class="btn btn-danger" id="confirmOk">Confirm</button>' +
+        '</div>';
 
-    showModal(content);
+    showmodel(content);
 
-    document.getElementById('confirmCancel').addEventListener('click', hideModal);
-    document.getElementById('confirmOk').addEventListener('click', () => {
-        hideModal();
+    document.getElementById('confirmCancel').addEventListener('click', hidemodel);
+    document.getElementById('confirmOk').addEventListener('click', function () {
+        hidemodel();
         onConfirm();
     });
 }
 
-export function formatDate(dateString) {
+export function formatthedate(dateString) {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    var date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function createTaskCard(task, teamId, onUpdate) {
-    const card = document.createElement('div');
-    card.className = 'task-card';
-    card.setAttribute('draggable', 'true');
-    card.dataset.taskId = task.id;
-    card.dataset.status = task.status;
+export function taskcrad(task, teamId, onUpdate) {
+    var crad = document.createElement('div');
+    crad.className = 'task-crad';
+    crad.setAttribute('draggable', 'true');
+    crad.dataset.taskId = task.id;
+    crad.dataset.status = task.status;
 
-    let priorityClass = '';
+    var priorityClass = '';
     if (task.priority === 'High') priorityClass = 'priority-high';
     else if (task.priority === 'Medium') priorityClass = 'priority-medium';
     else priorityClass = 'priority-low';
 
-    card.innerHTML = `
-        <div class="task-card-header">
-            <div class="task-card-title">${task.title || 'Untitled Task'}</div>
-            <button class="task-card-menu">⋯</button>
-        </div>
-        ${task.description ? `<div class="task-card-desc">${task.description}</div>` : ''}
-        <div class="task-card-footer">
-            ${task.priority ? `<span class="task-badge ${priorityClass}">${task.priority}</span>` : ''}
-            ${task.dueDate ? `<span class="task-badge due-date">📅 ${formatDate(task.dueDate)}</span>` : ''}
-            ${task.assignedTo ? `<span class="task-assignee">👤 ${task.assignedTo}</span>` : ''}
-        </div>
-    `;
+    var html = '<div class="task-crad-header">' +
+        '<div class="task-crad-title">' + (task.title || 'Untitled Task') + '</div>' +
+        '<button class="task-crad-menu">⋯</button>' +
+        '</div>';
 
-    card.addEventListener('dragstart', (e) => {
+    if (task.description) {
+        html += '<div class="task-crad-desc">' + task.description + '</div>';
+    }
+
+    html += '<div class="task-crad-footer">';
+
+    if (task.priority) {
+        html += '<span class="task-badge ' + priorityClass + '">' + task.priority + '</span>';
+    }
+    if (task.dueDate) {
+        html += '<span class="task-badge due-date">📅 ' + formatthedate(task.dueDate) + '</span>';
+    }
+    if (task.assignedTo) {
+        html += '<span class="task-assignee">👤 ' + task.assignedTo + '</span>';
+    }
+
+    html += '</div>';
+    crad.innerHTML = html;
+
+    crad.addEventListener('dragstart', function (e) {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', task.id);
-        card.classList.add('dragging');
+        crad.classList.add('dragging');
     });
 
-    card.addEventListener('dragend', () => {
-        card.classList.remove('dragging');
+    crad.addEventListener('dragend', function () {
+        crad.classList.remove('dragging');
     });
 
-    card.querySelector('.task-card-menu').addEventListener('click', (e) => {
+    crad.querySelector('.task-crad-menu').addEventListener('click', function (e) {
         e.stopPropagation();
-        showTaskMenu(task, teamId, onUpdate);
+        taskmenuuu(task, teamId, onUpdate);
     });
 
-    return card;
+    return crad;
 }
 
-export function showTaskMenu(task, teamId, onUpdate) {
-    const content = `
-        <h2>${task.title || 'Task'}</h2>
-        <div class="modal-section">
-            <p style="color: var(--color-text-secondary); margin-bottom: 16px;">${task.description || 'No description'}</p>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-                ${task.priority ? `<span class="task-badge priority-${task.priority.toLowerCase()}">${task.priority}</span>` : ''}
-                ${task.status ? `<span class="task-badge">${task.status}</span>` : ''}
-                ${task.dueDate ? `<span class="task-badge due-date">Due: ${formatDate(task.dueDate)}</span>` : ''}
-            </div>
-        </div>
-        <div class="modal-section">
-            <label for="taskStatus">Change Status</label>
-            <select id="taskStatus" class="input">
-                <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-            </select>
-        </div>
-        <div class="form-actions">
-            <button class="btn btn-danger" id="deleteTaskBtn">Delete</button>
-            <button class="btn btn-ghost" id="cancelTaskBtn">Cancel</button>
-            <button class="btn btn-primary" id="saveTaskBtn">Save Changes</button>
-        </div>
-    `;
+export function taskmenuuu(task, teamId, onUpdate) {
+    var priorityHtml = '';
+    if (task.priority) {
+        priorityHtml = '<span class="task-badge priority-' + task.priority.toLowerCase() + '">' + task.priority + '</span>';
+    }
+    var statusHtml = '';
+    if (task.status) {
+        statusHtml = '<span class="task-badge">' + task.status + '</span>';
+    }
+    var dueHtml = '';
+    if (task.dueDate) {
+        dueHtml = '<span class="task-badge due-date">Due: ' + formatthedate(task.dueDate) + '</span>';
+    }
 
-    showModal(content);
+    var content =
+        '<h2>' + (task.title || 'Task') + '</h2>' +
+        '<div class="model-section">' +
+        '<p style="color: var(--color-text-secondary); margin-bottom: 16px;">' + (task.description || 'No description') + '</p>' +
+        '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">' +
+        priorityHtml +
+        statusHtml +
+        dueHtml +
+        '</div>' +
+        '</div>' +
+        '<div class="model-section">' +
+        '<label for="taskStatus">Change Status</label>' +
+        '<select id="taskStatus" class="input">' +
+        '<option value="Pending" ' + (task.status === 'Pending' ? 'selected' : '') + '>Pending</option>' +
+        '<option value="In Progress" ' + (task.status === 'In Progress' ? 'selected' : '') + '>In Progress</option>' +
+        '<option value="Completed" ' + (task.status === 'Completed' ? 'selected' : '') + '>Completed</option>' +
+        '</select>' +
+        '</div>' +
+        '<div class="form-actions">' +
+        '<button class="btn btn-danger" id="deleteTaskBtn">Delete</button>' +
+        '<button class="btn btn-ghost" id="cancelTaskBtn">Cancel</button>' +
+        '<button class="btn btn-primary" id="saveTaskBtn">Save Changes</button>' +
+        '</div>';
 
-    document.getElementById('cancelTaskBtn').addEventListener('click', hideModal);
+    showmodel(content);
 
-    document.getElementById('saveTaskBtn').addEventListener('click', async () => {
-        const newStatus = document.getElementById('taskStatus').value;
+    document.getElementById('cancelTaskBtn').addEventListener('click', hidemodel);
+
+    document.getElementById('saveTaskBtn').addEventListener('click', async function () {
+        var newStatus = document.getElementById('taskStatus').value;
         if (newStatus !== task.status) {
             await onUpdate(task.id, { status: newStatus });
         }
-        hideModal();
+        hidemodel();
     });
 
-    document.getElementById('deleteTaskBtn').addEventListener('click', () => {
-        hideModal();
-        showConfirm('Are you sure you want to delete this task?', () => {
+    document.getElementById('deleteTaskBtn').addEventListener('click', function () {
+        hidemodel();
+        showConfirm('Are you sure you want to delete this task?', function () {
             onUpdate(task.id, { _delete: true });
         });
     });
 }
 
 export function createKanbanBoard(tasks, teamId, onUpdate) {
-    const board = document.createElement('div');
+    var board = document.createElement('div');
     board.className = 'kanban-board';
 
-    const statuses = ['Pending', 'In Progress', 'Completed'];
+    var statuses = ['Pending', 'In Progress', 'Completed'];
 
-    statuses.forEach(status => {
-        const column = document.createElement('div');
+    for (var i = 0; i < statuses.length; i++) {
+        var status = statuses[i];
+        var column = document.createElement('div');
         column.className = 'kanban-column';
         column.dataset.status = status;
 
-        const tasksByStatus = tasks.filter(t => t.status === status);
+        var tasksByStatus = [];
+        for (var j = 0; j < tasks.length; j++) {
+            if (tasks[j].status === status) {
+                tasksByStatus.push(tasks[j]);
+            }
+        }
 
-        column.innerHTML = `
-            <div class="kanban-column-header">
-                <span class="kanban-column-title">${status}</span>
-                <span class="kanban-column-count">${tasksByStatus.length}</span>
-            </div>
-            <div class="kanban-column-body"></div>
-        `;
+        column.innerHTML =
+            '<div class="kanban-column-header">' +
+            '<span class="kanban-column-title">' + status + '</span>' +
+            '<span class="kanban-column-count">' + tasksByStatus.length + '</span>' +
+            '</div>' +
+            '<div class="kanban-column-body"></div>';
 
-        const columnBody = column.querySelector('.kanban-column-body');
+        var columnBody = column.querySelector('.kanban-column-body');
 
-        tasksByStatus.forEach(task => {
-            const card = createTaskCard(task, teamId, onUpdate);
-            columnBody.appendChild(card);
-        });
+        for (var k = 0; k < tasksByStatus.length; k++) {
+            var crad = taskcrad(tasksByStatus[k], teamId, onUpdate);
+            columnBody.appendChild(crad);
+        }
 
-        columnBody.addEventListener('dragover', (e) => {
+        columnBody.addEventListener('dragover', function (e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         });
 
-        columnBody.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            const taskId = e.dataTransfer.getData('text/plain');
-            const draggingCard = document.querySelector(`[data-task-id="${taskId}"]`);
+        (function (currentStatus) {
+            columnBody.addEventListener('drop', async function (e) {
+                e.preventDefault();
+                var taskId = e.dataTransfer.getData('text/plain');
+                var draggingcrad = document.querySelector('[data-task-id="' + taskId + '"]');
 
-            if (draggingCard && draggingCard.dataset.status !== status) {
-                await onUpdate(taskId, { status });
-            }
-        });
+                if (draggingcrad && draggingcrad.dataset.status !== currentStatus) {
+                    await onUpdate(taskId, { status: currentStatus });
+                }
+            });
+        })(status);
 
         board.appendChild(column);
-    });
+    }
 
     return board;
 }

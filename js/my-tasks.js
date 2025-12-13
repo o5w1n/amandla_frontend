@@ -7,33 +7,39 @@ if (!checkAuth()) {
     window.location.href = 'index.html';
 }
 
-
-document.getElementById('sidebarToggle').addEventListener('click', () => {
+document.getElementById('sidebarToggle').addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('collapsed');
 });
 
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
+document.getElementById('logoutBtn').addEventListener('click', function () {
     logout();
     window.location.href = 'index.html';
 });
 
-let currentTasks = [];
+var currentTasks = [];
 
 async function loadMyTasks() {
-    const container = document.getElementById('myTasksContainer');
+    var container = document.getElementById('myTasksContainer');
     container.innerHTML = '<div class="skeleton-card"></div>';
 
     try {
-        const data = await getMyTasks();
-        const tasks = data.tasks || [];
+        var data = await getMyTasks();
+        var tasks = [];
+        if (data.tasks) {
+            tasks = data.tasks;
+        }
         currentTasks = tasks;
 
+        var totalTasks = tasks.length;
+        var pendingTasks = 0;
+        var inProgressTasks = 0;
+        var completedTasks = 0;
 
-        const totalTasks = tasks.length;
-        const pendingTasks = tasks.filter(t => t.status === 'Pending').length;
-        const inProgressTasks = tasks.filter(t => t.status === 'In Progress').length;
-        const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+        for (var i = 0; i < tasks.length; i++) {
+            if (tasks[i].status === 'Pending') pendingTasks++;
+            else if (tasks[i].status === 'In Progress') inProgressTasks++;
+            else if (tasks[i].status === 'Completed') completedTasks++;
+        }
 
         document.getElementById('totalTasksCount').textContent = totalTasks;
         document.getElementById('pendingTasksCount').textContent = pendingTasks;
@@ -46,19 +52,20 @@ async function loadMyTasks() {
         }
 
         container.innerHTML = '';
+        var tasksByTeam = {};
+        for (var j = 0; j < tasks.length; j++) {
+            var t = tasks[j];
+            var teamId = t.teamId;
+            if (!teamId) teamId = t.team_id;
+            if (!teamId) teamId = 'unknown';
 
-
-        const tasksByTeam = {};
-        tasks.forEach(task => {
-            const teamId = task.teamId || task.team_id || 'unknown';
             if (!tasksByTeam[teamId]) {
                 tasksByTeam[teamId] = [];
             }
-            tasksByTeam[teamId].push(task);
-        });
+            tasksByTeam[teamId].push(t);
+        }
 
-
-        const kanban = createKanbanBoard(tasks, null, handleTaskUpdate);
+        var kanban = createKanbanBoard(tasks, null, handleTaskUpdate);
         container.appendChild(kanban);
 
     } catch (error) {
@@ -69,14 +76,21 @@ async function loadMyTasks() {
 }
 
 async function handleTaskUpdate(taskId, updates) {
+    var task = null;
+    for (var i = 0; i < currentTasks.length; i++) {
+        if (currentTasks[i].id === taskId) {
+            task = currentTasks[i];
+            break;
+        }
+    }
 
-    const task = currentTasks.find(t => t.id === taskId);
     if (!task) {
         showToast('Task not found', 'error');
         return;
     }
 
-    const teamId = task.teamId || task.team_id;
+    var teamId = task.teamId;
+    if (!teamId) teamId = task.team_id;
 
     if (updates._delete) {
         try {

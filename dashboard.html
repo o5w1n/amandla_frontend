@@ -63,12 +63,12 @@
         </main>
     </div>
     
-    <div id="modal-container"></div>
+    <div id="model-container"></div>
     <div id="toast-container"></div>
     
     <script type="module">
         import { logout, checkAuth } from './js/auth.js';
-        import { showModal, hideModal, showToast } from './js/ui.js';
+        import { showmodel, hidemodel, showToast } from './js/ui.js';
         import { getPublicTeams, joinTeam } from './js/api.js';
         
         if (!checkAuth()) {
@@ -107,19 +107,19 @@
                 
                 const modalContent = `
                     <h2>Join a Team</h2>
-                    <div class="modal-section">
+                    <div class="model-section">
                         <label for="teamId">Enter Team ID</label>
                         <input type="text" id="teamId" placeholder="Enter team ID to join" class="input">
                         <button class="btn btn-primary" id="joinByIdBtn" style="margin-top: 12px;">Join by ID</button>
                     </div>
-                    <div class="modal-divider">OR</div>
-                    <div class="modal-section">
+                    <div class="model-divider">OR</div>
+                    <div class="model-section">
                         <h3>Available Teams</h3>
                         <div class="team-list">${teamsHTML}</div>
                     </div>
                 `;
                 
-                showModal(modalContent);
+                showmodel(modalContent);
                 
                 document.getElementById('joinByIdBtn').addEventListener('click', async () => {
                     const teamId = document.getElementById('teamId').value.trim();
@@ -131,7 +131,7 @@
                     try {
                         await joinTeam(teamId);
                         showToast('Successfully joined team!', 'success');
-                        hideModal();
+                        hidemodel();
                         setTimeout(() => window.location.href = `team-detail.html?id=${teamId}`, 1000);
                     } catch (error) {
                         showToast(error.message || 'Failed to join team', 'error');
@@ -144,7 +144,7 @@
                         try {
                             await joinTeam(teamId);
                             showToast('Successfully joined team!', 'success');
-                            hideModal();
+                            hidemodel();
                             setTimeout(() => window.location.href = `team-detail.html?id=${teamId}`, 1000);
                         } catch (error) {
                             showToast(error.message || 'Failed to join team', 'error');

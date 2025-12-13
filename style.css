@@ -757,7 +757,7 @@ textarea {
   font-size: 13px;
 }
 
-#modal-container {
+#model-container {
   display: none;
   position: fixed;
   top: 0;
@@ -771,11 +771,11 @@ textarea {
   padding: var(--spacing-lg);
 }
 
-#modal-container.active {
+#model-container.active {
   display: flex;
 }
 
-.modal {
+.model {
   background: var(--color-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
@@ -798,33 +798,33 @@ textarea {
   }
 }
 
-.modal h2 {
+.model h2 {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: var(--spacing-lg);
   color: var(--color-text-primary);
 }
 
-.modal h3 {
+.model h3 {
   font-size: 18px;
   font-weight: 600;
   margin: var(--spacing-md) 0;
   color: var(--color-text-primary);
 }
 
-.modal-section {
+.model-section {
   margin-bottom: var(--spacing-lg);
 }
 
-.modal-divider {
+.model-divider {
   text-align: center;
   color: var(--color-text-tertiary);
   margin: var(--spacing-lg) 0;
   position: relative;
 }
 
-.modal-divider::before,
-.modal-divider::after {
+.model-divider::before,
+.model-divider::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -833,11 +833,11 @@ textarea {
   background: var(--color-border);
 }
 
-.modal-divider::before {
+.model-divider::before {
   left: 0;
 }
 
-.modal-divider::after {
+.model-divider::after {
   right: 0;
 }
 

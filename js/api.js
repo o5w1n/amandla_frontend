@@ -1,21 +1,19 @@
-const api_url = 'https://amandla-backend.onrender.com';
+var auttoking = null;
 
-let authToken = null;
-
-export async function checkBackendHealth() {
+export async function checkbh() {
     try {
-        const response = await fetch(`${api_url}/health`);
-        const data = await response.json();
-        console.log('Backend health check:', data);
+        var response = await fetch('https://amandla-backend.onrender.com/health');
+        var data = await response.json();
+        console.log('Sharrp the health check for the backend was sucessful', data);
         return data;
-    } catch (error) {
-        console.error('Backend health check failed:', error);
-        throw error;
+    } catch (err) {
+        console.error('The was an error while checking the backend health bro:', err);
+        throw err;
     }
 }
 
 export function setToken(token) {
-    authToken = token;
+    auttoking = token;
     if (token) {
         localStorage.setItem('amandla_token', token);
     } else {
@@ -24,33 +22,38 @@ export function setToken(token) {
 }
 
 export function getToken() {
-    if (!authToken) {
-        authToken = localStorage.getItem('amandla_token');
+    if (!auttoking) {
+        auttoking = localStorage.getItem('amandla_token');
     }
-    return authToken;
+    return auttoking;
 }
 
-export async function apiFetch(url, options = {}) {
-    const token = getToken();
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
-
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+export async function apiFetch(url, options) {
+    if (!options) {
+        options = {};
     }
 
-    const config = {
-        ...options,
-        headers,
+    var token = getToken();
+    var headers = {
+        'Content-Type': 'application/json'
     };
 
-    const response = await fetch(`${api_url}${url}`, config);
+    if (options.headers) {
+        headers = Object.assign({}, headers, options.headers);
+    }
+
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+    }
+
+    var config = Object.assign({}, options);
+    config.headers = headers;
+
+    var response = await fetch('https://amandla-backend.onrender.com' + url, config);
 
     if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Request failed' }));
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+        var error = await response.json().catch(function () { return { message: 'Request failed' }; });
+        throw new Error(error.message || 'HTTP error! status: ' + response.status);
     }
 
     return response.json();
@@ -59,14 +62,14 @@ export async function apiFetch(url, options = {}) {
 export async function register(username, email, password) {
     return apiFetch('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username: username, email: email, password: password })
     });
 }
 
 export async function login(email, password) {
-    const data = await apiFetch('/auth/login', {
+    var data = await apiFetch('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email, password: password })
     });
     if (data.token) {
         setToken(data.token);
@@ -74,22 +77,23 @@ export async function login(email, password) {
     return data;
 }
 
-export async function createTeam(teamname, memberemail = []) {
+export async function createTeam(teamname, memberemail) {
+    if (!memberemail) memberemail = [];
     return apiFetch('/auth/team/create', {
         method: 'POST',
-        body: JSON.stringify({ teamname, memberemail }),
+        body: JSON.stringify({ teamname: teamname, memberemail: memberemail })
     });
 }
 
 export async function joinTeam(teamId) {
-    return apiFetch(`/auth/team/${teamId}/join`, {
-        method: 'POST',
+    return apiFetch('/auth/team/' + teamId + '/join', {
+        method: 'POST'
     });
 }
 
 export async function leaveTeam(teamId) {
-    return apiFetch(`/auth/team/${teamId}/leave`, {
-        method: 'POST',
+    return apiFetch('/auth/team/' + teamId + '/leave', {
+        method: 'POST'
     });
 }
 
@@ -102,43 +106,47 @@ export async function getPublicTeams() {
 }
 
 export async function getTeam(teamId) {
-    return apiFetch(`/auth/team/${teamId}`);
+    return apiFetch('/auth/team/' + teamId);
 }
 
 export async function createTask(teamId, taskData) {
-    return apiFetch(`/auth/team/${teamId}/tasks`, {
+    return apiFetch('/auth/team/' + teamId + '/tasks', {
         method: 'POST',
-        body: JSON.stringify(taskData),
+        body: JSON.stringify(taskData)
     });
 }
 
-export async function getTasks(teamId, filters = {}) {
-    const query = new URLSearchParams(filters).toString();
-    const url = `/auth/team/${teamId}/tasks${query ? `?${query}` : ''}`;
+export async function getTasks(teamId, filters) {
+    if (!filters) filters = {};
+    var query = new URLSearchParams(filters).toString();
+    var url = '/auth/team/' + teamId + '/tasks';
+    if (query) {
+        url = url + '?' + query;
+    }
     return apiFetch(url);
 }
 
 export async function getTask(teamId, taskId) {
-    return apiFetch(`/auth/team/${teamId}/tasks/${taskId}`);
+    return apiFetch('/auth/team/' + teamId + '/tasks/' + taskId);
 }
 
 export async function updateTask(teamId, taskId, updates) {
-    return apiFetch(`/auth/team/${teamId}/tasks/${taskId}`, {
+    return apiFetch('/auth/team/' + teamId + '/tasks/' + taskId, {
         method: 'PUT',
-        body: JSON.stringify(updates),
+        body: JSON.stringify(updates)
     });
 }
 
 export async function deleteTask(teamId, taskId) {
-    return apiFetch(`/auth/team/${teamId}/tasks/${taskId}`, {
-        method: 'DELETE',
+    return apiFetch('/auth/team/' + teamId + '/tasks/' + taskId, {
+        method: 'DELETE'
     });
 }
 
 export async function assignTask(teamId, taskId, assignedTo) {
-    return apiFetch(`/auth/team/${teamId}/tasks/${taskId}/assign`, {
+    return apiFetch('/auth/team/' + teamId + '/tasks/' + taskId + '/assign', {
         method: 'POST',
-        body: JSON.stringify({ assignedTo }),
+        body: JSON.stringify({ assignedTo: assignedTo })
     });
 }
 

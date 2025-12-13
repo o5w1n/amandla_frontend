@@ -1,12 +1,12 @@
 import { login as apiLogin, register as apiRegister, setToken, getToken } from './api.js';
 
 export async function login(email, password) {
-    const data = await apiLogin(email, password);
+    var data = await apiLogin(email, password);
     return data;
 }
 
 export async function register(username, email, password) {
-    const data = await apiRegister(username, email, password);
+    var data = await apiRegister(username, email, password);
     return data;
 }
 
@@ -16,7 +16,7 @@ export function logout() {
 }
 
 export function checkAuth() {
-    const token = getToken();
+    var token = getToken();
     return !!token;
 }
 

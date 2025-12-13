@@ -1,38 +1,44 @@
 import { getTeam, getTasks, createTask, updateTask, deleteTask } from './api.js';
 import { logout, checkAuth } from './auth.js';
-import { showModal, hideModal, showToast, createKanbanBoard } from './ui.js';
+import { showmodel, hidemodel, showToast, createKanbanBoard } from './ui.js';
 
 if (!checkAuth()) {
     window.location.href = 'index.html';
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const teamId = urlParams.get('id');
+var urlParams = new URLSearchParams(window.location.search);
+var teamId = urlParams.get('id');
 
 if (!teamId) {
     showToast('No team ID provided', 'error');
-    setTimeout(() => window.location.href = 'teams.html', 2000);
+    setTimeout(function () { window.location.href = 'teams.html'; }, 2000);
 }
 
-document.getElementById('sidebarToggle').addEventListener('click', () => {
+document.getElementById('sidebarToggle').addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('collapsed');
 });
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
+document.getElementById('logoutBtn').addEventListener('click', function () {
     logout();
     window.location.href = 'index.html';
 });
 
 async function loadTeamDetails() {
     try {
-        const data = await getTeam(teamId);
-        const team = data.team || {};
-        const members = data.members || [];
+        var data = await getTeam(teamId);
+        var team = {};
+        if (data.team) team = data.team;
+        var members = [];
+        if (data.members) members = data.members;
 
-        document.getElementById('teamName').textContent = team.name || team.teamname || 'Team';
+        var name = team.name;
+        if (!name) name = team.teamname;
+        if (!name) name = 'Team';
+        document.getElementById('teamName').textContent = name;
         document.getElementById('teamId').textContent = team.id;
 
-        const memberCount = members.length || 0;
+        var memberCount = members.length;
+        if (!memberCount) memberCount = 0;
         document.getElementById('memberCount').textContent = memberCount;
 
         await loadTasks();
@@ -43,19 +49,25 @@ async function loadTeamDetails() {
     }
 }
 
-let currentTasks = [];
+var currentTasks = [];
 
 async function loadTasks() {
-    const container = document.getElementById('tasksContainer');
+    var container = document.getElementById('tasksContainer');
     container.innerHTML = '<div class="skeleton-card"></div>';
 
     try {
-        const data = await getTasks(teamId);
-        const tasks = data.task || [];
+        var data = await getTasks(teamId);
+        var tasks = [];
+        if (data.task) tasks = data.task;
         currentTasks = tasks;
 
-        const totalTasks = tasks.length;
-        const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+        var totalTasks = tasks.length;
+        var completedTasks = 0;
+        for (var i = 0; i < tasks.length; i++) {
+            if (tasks[i].status === 'Completed') {
+                completedTasks++;
+            }
+        }
 
         document.getElementById('taskCount').textContent = totalTasks;
         document.getElementById('completedCount').textContent = completedTasks;
@@ -66,7 +78,7 @@ async function loadTasks() {
         }
 
         container.innerHTML = '';
-        const kanban = createKanbanBoard(tasks, teamId, handleTaskUpdate);
+        var kanban = createKanbanBoard(tasks, teamId, handleTaskUpdate);
         container.appendChild(kanban);
 
     } catch (error) {
@@ -96,64 +108,66 @@ async function handleTaskUpdate(taskId, updates) {
     }
 }
 
-document.getElementById('createTaskBtn').addEventListener('click', () => {
-    const modalContent = `
-        <h2>Create New Task</h2>
-        <form id="createTaskForm">
-            <div class="form-group">
-                <label for="taskTitle">Title</label>
-                <input type="text" id="taskTitle" class="input" placeholder="Enter task title" required>
-            </div>
-            <div class="form-group">
-                <label for="taskDesc">Description</label>
-                <textarea id="taskDesc" class="input" placeholder="Enter task description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="taskPriority">Priority</label>
-                <select id="taskPriority" class="input">
-                    <option value="Low">Low</option>
-                    <option value="Medium" selected>Medium</option>
-                    <option value="High">High</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="taskDueDate">Due Date</label>
-                <input type="date" id="taskDueDate" class="input">
-            </div>
-            <div class="form-group">
-                <label for="taskAssignee">Assigned To (User ID - Optional)</label>
-                <input type="text" id="taskAssignee" class="input" placeholder="Enter user ID">
-            </div>
-            <div class="form-error" id="createTaskError"></div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-ghost" id="cancelCreateTask">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Task</button>
-            </div>
-        </form>
-    `;
+document.getElementById('createTaskBtn').addEventListener('click', function () {
+    var modalContent =
+        '<h2>Create New Task</h2>' +
+        '<form id="createTaskForm">' +
+        '<div class="form-group">' +
+        '<label for="taskTitle">Title</label>' +
+        '<input type="text" id="taskTitle" class="input" placeholder="Enter task title" required>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="taskDesc">Description</label>' +
+        '<textarea id="taskDesc" class="input" placeholder="Enter task description"></textarea>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="taskPriority">Priority</label>' +
+        '<select id="taskPriority" class="input">' +
+        '<option value="Low">Low</option>' +
+        '<option value="Medium" selected>Medium</option>' +
+        '<option value="High">High</option>' +
+        '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="taskDueDate">Due Date</label>' +
+        '<input type="date" id="taskDueDate" class="input">' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="taskAssignee">Assigned To (User ID - Optional)</label>' +
+        '<input type="text" id="taskAssignee" class="input" placeholder="Enter user ID">' +
+        '</div>' +
+        '<div class="form-error" id="createTaskError"></div>' +
+        '<div class="form-actions">' +
+        '<button type="button" class="btn btn-ghost" id="cancelCreateTask">Cancel</button>' +
+        '<button type="submit" class="btn btn-primary">Create Task</button>' +
+        '</div>' +
+        '</form>';
 
-    showModal(modalContent);
+    showmodel(modalContent);
 
-    document.getElementById('cancelCreateTask').addEventListener('click', hideModal);
+    document.getElementById('cancelCreateTask').addEventListener('click', hidemodel);
 
-    document.getElementById('createTaskForm').addEventListener('submit', async (e) => {
+    document.getElementById('createTaskForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const errorDiv = document.getElementById('createTaskError');
+        var errorDiv = document.getElementById('createTaskError');
         errorDiv.textContent = '';
 
-        const taskData = {
+        var taskData = {
             title: document.getElementById('taskTitle').value,
             description: document.getElementById('taskDesc').value,
             priority: document.getElementById('taskPriority').value,
-            dueDate: document.getElementById('taskDueDate').value || undefined,
-            assignedTo: document.getElementById('taskAssignee').value || undefined,
+            dueDate: document.getElementById('taskDueDate').value,
+            assignedTo: document.getElementById('taskAssignee').value
         };
+
+        if (!taskData.dueDate) delete taskData.dueDate;
+        if (!taskData.assignedTo) delete taskData.assignedTo;
 
         try {
             await createTask(teamId, taskData);
             showToast('Task created successfully!', 'success');
-            hideModal();
+            hidemodel();
             await loadTasks();
         } catch (error) {
             errorDiv.textContent = error.message || 'Failed to create task';
